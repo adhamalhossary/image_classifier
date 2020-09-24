@@ -1,6 +1,6 @@
 # Machine Learning Nanodegree
 ## Deep Learning
-## Project: Image Classifier for flowers using Tensorflow
+## Project: Image Classifier for Flowers using Tensorflow
 
 ----
 ## Introduction
