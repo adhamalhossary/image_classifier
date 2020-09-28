@@ -1,74 +1,55 @@
 import tensorflow as tf
 import tensorflow_hub as hub
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-from PIL import Image
 import json
-
 import argparse
 
-keras_model = tf.keras.models.load_model('flower_image_classifier.h5', custom_objects={'KerasLayer':hub.KerasLayer})
+from prettytable import PrettyTable
 
-keras_model.summary()
+from supporting_functions import predict
 
-with open('label_map.json', 'r') as f:
-    class_names = json.load(f)
-    class_names = {int(key): class_names[key] for key in class_names}
+# Argument Parser is used to retrieve user input from command line
+parser = argparse.ArgumentParser()
 
-def process_image(image):
+parser.add_argument('image_path', action="store")
+parser.add_argument('saved_model', action="store")
+parser.add_argument('--top_k', action="store", type=int)
+parser.add_argument('--category_names', action="store")
 
-  tensor_image = tf.image.resize(image,(224,224))
-  tensor_image /= 255
-  numpy_image = tensor_image.numpy()
+user_input = parser.parse_args()
 
-  return numpy_image
+saved_model = user_input.saved_model
+image_path = user_input.image_path
+top_k = user_input.top_k
+category_names = user_input.category_names
 
+# Keras model is loaded to be used for predictions
+keras_model = tf.keras.models.load_model(saved_model, custom_objects={'KerasLayer': hub.KerasLayer})
 
-def predict(image_path, model, top_k):
-    im = Image.open(image_path)
-    test_image = np.asarray(im)
-    processed_test_image = process_image(test_image)
-    expanded_test_image = np.expand_dims(processed_test_image, axis=0)
+# If statement is used to detect user input for top_k
+if top_k is None:
+    top_values, top_labels = predict(image_path, keras_model)
+else:
+    top_values, top_labels = predict(image_path, keras_model, top_k=top_k)
 
-    predictions = model.predict(expanded_test_image)
+# top_values and top_labels are indexed to retrieve list of values
+top_values = top_values[0]
+top_labels = top_labels[0]
 
-    top_k_values, top_k_indices = tf.nn.top_k(predictions, k=top_k)
+# If statement is used to detect user input for category_names
+if category_names is None:
+    pass
+else:
+    with open(category_names, 'r') as f:
+        class_names = json.load(f)
+        class_names = {int(key): class_names[key] for key in class_names}
 
-    top_k_values = top_k_values.numpy()
-    top_k_labels = (top_k_indices + 1).numpy()
+    top_labels = [class_names.get(label) for label in top_labels]
 
-    return top_k_values, top_k_labels, processed_test_image
+# PrettyTable is used to print out a neat table of classes with their corresponding probabilities
+table = PrettyTable(['Class', 'Probability'])
 
+for value, label in zip(top_values, top_labels):
+    table.add_row([label, round(value, 2)])
 
-
-
-#
-# import os
-#
-# directory = './test_images'
-
-
-# for filename in os.listdir(directory):
-#     if filename.endswith(".jpg"):
-#       image_path = os.path.join(directory, filename)
-#
-#       probs, labels, image = predict(image_path, keras_model, 5)
-#
-#       class_labels = [class_names.get(label) for label in labels[0]]
-#
-#       fig, (ax1, ax2) = plt.subplots(figsize=(10,10), ncols=2)
-#       ax1.imshow(image)
-#       ax1.axis('off')
-#       ax1.set_title(filename.strip('.jpg').replace('_'," "))
-#
-#       ax2.barh(np.arange(5), probs[0])
-#       ax2.set_aspect(0.1)
-#       ax2.set_yticks(np.arange(5))
-#       ax2.set_yticklabels(class_labels, size='large');
-#       ax2.set_title('Class Probability')
-#       ax2.set_xlim(0, 1.1)
-#       plt.tight_layout()
-#
-#       plt.show()
+print(table)
