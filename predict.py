@@ -8,16 +8,21 @@ from prettytable import PrettyTable
 
 from supporting_functions import predict
 
+'''predict.py is used as a command line application to accurately classify flower images by returning a table of top K 
+labels with their probabilities'''
+
 # Argument Parser is used to retrieve user input from command line
 parser = argparse.ArgumentParser()
 
 parser.add_argument('image_path', action="store")
-parser.add_argument('saved_model', action="store")
-parser.add_argument('--top_k', action="store", type=int)
-parser.add_argument('--category_names', action="store")
+parser.add_argument('saved_model', action="store", help='Keras model used to make predictions on new images')
+parser.add_argument('--top_k', action="store", type=int, help='Integer representing top K labels with highest'
+                                                              ' probabilities')
+parser.add_argument('--category_names', action="store", help='Json file that maps the numerical labels to flower names')
 
 user_input = parser.parse_args()
 
+# Saves user input to variables
 saved_model = user_input.saved_model
 image_path = user_input.image_path
 top_k = user_input.top_k

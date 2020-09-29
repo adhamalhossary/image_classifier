@@ -3,6 +3,10 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 
+'''This python script contains a set of functions used in predict.py to resize and rescale the images,
+ then make predictions on these images'''
+
+
 # This function is used to resize and normalize the image for appropriate usage by the model for accurate predictions
 def process_image(image):
     tensor_image = tf.image.resize(image, (224, 224))
@@ -10,6 +14,7 @@ def process_image(image):
     numpy_image = tensor_image.numpy()
 
     return numpy_image
+
 
 # This function is used to return two lists; one containing the labels with the highest probabilities, and the other
 # containing the probabilities
