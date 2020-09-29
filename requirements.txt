@@ -1,0 +1,5 @@
+tensorflow==2.3.0
+tensorflow_hub==0.9.0
+prettytable==0.7.2
+numpy==1.19.2
+Pillow==7.2.0
