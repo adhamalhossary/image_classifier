@@ -18,4 +18,7 @@ This project is divided into two parts; training of the model in the notebook, a
 - Evaluating the model using the test set
 - Saving of the trained keras model
 
-2) `predict.py` works by first accepting two positional arguments; the `image_path` of the image wanting to make inference on, and the `saved_model` from the notebook. It also accepts two optional arguments; `top_k` representing top **K** labels with the highest probabilities, and `category_names`, a json file that maps the numerical labels to flower names. It then returns a table with the top K labels and their probabilities. If top_k was not specified it would only return the label with the highest probability. Using `category_names` would return the flower names instead of the numerical labels.
+2) `predict.py` works by:
+- Accepting two positional arguments; the `image_path` of the image wanting to make inference on, and the `saved_model` from the notebook.
+- It also accepts two optional arguments; `top_k` representing top **K** labels with the highest probabilities, and `category_names`, a json file that maps the numerical labels to flower names.
+- It then returns a table with the top K labels and their probabilities. If top_k was not specified it would only return the label with the highest probability. Using `category_names` would return the flower names instead of the numerical labels.
